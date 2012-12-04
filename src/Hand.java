@@ -28,7 +28,6 @@ public class Hand extends Deck{
 
     Hand(String[] cards){
         this.hand = new ArrayList<Card>();
-        //board = new ArrayList<Card>();
         Card temp;
         for(int i=0; i<cards.length; i++){
             temp = new Card(cards[i]);

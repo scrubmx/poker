@@ -1,5 +1,5 @@
 /* menuPrincipal.java
- * Created on 26-oct-2011, 13:42:24*/
+ * Created on 26-OCT-2011, 13:42:24 */
 
 import java.util.Arrays;
 import javax.swing.JOptionPane;
@@ -20,29 +20,31 @@ public class menuPrincipal extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
-        labelYourCards = new javax.swing.JLabel();
-        textFieldHandOne = new javax.swing.JTextField();
-        labelOpponentOne = new javax.swing.JLabel();
-        textFieldHandTwo = new javax.swing.JTextField();
-        labelBoard = new javax.swing.JLabel();
-        textFieldBoard = new javax.swing.JTextField();
-        buttonCalculate = new javax.swing.JButton();
-        buttonReset = new javax.swing.JButton();
-        labelResult = new javax.swing.JLabel();
-        labelDeadCards = new javax.swing.JLabel();
-        textFieldDeadCards = new javax.swing.JTextField();
-        jMenuBar = new javax.swing.JMenuBar();
-        menuArchivo = new javax.swing.JMenu();
-        menuEditar = new javax.swing.JMenu();
-        menuAyuda = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-
+        labelYourCards 		= new javax.swing.JLabel();
+        textFieldHandOne 	= new javax.swing.JTextField();
+        labelOpponentOne 	= new javax.swing.JLabel();
+        textFieldHandTwo 	= new javax.swing.JTextField();
+        labelBoard 			= new javax.swing.JLabel();
+        textFieldBoard 		= new javax.swing.JTextField();
+        buttonCalculate 	= new javax.swing.JButton();
+        buttonReset 		= new javax.swing.JButton();
+        labelResult 		= new javax.swing.JLabel();
+        labelDeadCards 		= new javax.swing.JLabel();
+        textFieldDeadCards 	= new javax.swing.JTextField();
+        jMenuBar 			= new javax.swing.JMenuBar();
+        menuArchivo 		= new javax.swing.JMenu();
+        menuEditar 			= new javax.swing.JMenu();
+        menuAyuda 			= new javax.swing.JMenu();
+        jMenuItem1 			= new javax.swing.JMenuItem();
+        
+        /* ends the java process on window close event */
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        
+        /* title of the window */
         setTitle("Poker Odds Calculator");
 
         labelYourCards.setText("Your Cards:");
-
+        
         labelOpponentOne.setText("Opponent 1:");
 
         labelBoard.setText("Board:");
@@ -138,8 +140,8 @@ public class menuPrincipal extends javax.swing.JFrame {
                     .addComponent(labelResult, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
-
         pack();
+    
     }// </editor-fold>//GEN-END:initComponents
 
 private void buttonCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCalculateActionPerformed
@@ -154,85 +156,104 @@ private void buttonCalculateActionPerformed(java.awt.event.ActionEvent evt) {//G
     String[] handOneArray;
     String[] handTwoArray;
     
-    int numberOfHands = 10000;
-    int count_player_one_wins = 0;
-    int count_player_two_wins = 0;
-    int tie = 0;
-    int ranking_hand_one = 0;
-    int ranking_hand_two = 0;
-    Deck deck = new Deck();
-    Hand handPlayerOne;
-    Hand handPlayerTwo;
+    int numberOfHands = 10000;		// set the number of times the hand is going to be played
+    int count_player_one_wins = 0;	// count the number of times player one wins the hand
+    int count_player_two_wins = 0;	// count the number of times player two wins the hand
+    int tie = 0;					// count the number of times the hand results in a tie
+    int ranking_hand_one = 0;		// saves the value of player one current hand in numeric form
+    int ranking_hand_two = 0;		// saves the value of player two current hand in numeric form
+    Deck deck = new Deck();			// initializes a new Deck object
+    Hand handPlayerOne;				// initializes a new Hand object for player one
+    Hand handPlayerTwo;				// initializes a new Hand object for player two
     
-    Hand best_hand_one = new Hand();
-    Hand best_hand_two = new Hand();
-    
-    
+    Hand best_hand_one = new Hand(); // this Hand object is used to save the best five card combination for player one	
+    Hand best_hand_two = new Hand(); // this Hand object is used to save the best five card combination for player two	
+      
+    /** 
+     * Set up the hands for the two players
+     */
     String handOne = this.textFieldHandOne.getText();
     if("".equals(handOne)){
-        JOptionPane.showMessageDialog(null, "You must enter a hand in this format: \n\n"
-               + "As,Td,4c", "Error", JOptionPane.WARNING_MESSAGE);
-        return; 
+        JOptionPane.showMessageDialog(null, "\nPlayer one hand can't be an empty hand, \nYou must enter a hand in this format: \n\n"
+               + "As,Td,4c or Kd6c9s", "Error", JOptionPane.WARNING_MESSAGE);
+        return;
     }else{
-        handOneArray = handOne.split(",\\s*");
+        //handOneArray = handOne.split(",\\s*");
+        handOne.replaceAll("\\s","");		// remove all the whitespace from the string
+        handOneArray = handOne.split(",");	// divide the string into an array
+        
+        /** 
+	     * if the array contains only one element there are two posible scenarios
+	     * the player only enetered 1 card or the player forgot to put commas in his query.
+	     */
+        if(handOneArray.length == 1){
+	        String putTheCommas = handOneArray[0];
+	        /* for loop to put commas in place */
+	        for(int i=2; i<putTheCommas.length(); i+=2){
+		       putTheCommas = putTheCommas.substring(0, i) + "," + putTheCommas.substring(i+2, putTheCommas.length());
+	        }
+	        
+	        handOne = putTheCommas.substring(0, putTheCommas.lastIndexOf(",")); // remove trailing comma
+	        Arrays.fill(handOneArray, null);   // empty the array
+	        handOneArray = handOne.split(","); // this time we know the commas are there
+        }
+        
         handPlayerOne = new Hand(handOneArray);
         deck.removeCards(handOneArray);
         if(handPlayerOne.getTotalCards()>5){
-            JOptionPane.showMessageDialog(null, "More than 5 cards each player is not allowed.", "Error", JOptionPane.WARNING_MESSAGE);
-            return; 
+            JOptionPane.showMessageDialog(null, "More than 5 cards is not allowed.", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
         }
     }
     
+    /* SAME METHOD FOR PLAYER TWO HAND */
     String handTwo = this.textFieldHandTwo.getText();
-    if("".equals(handTwo) || handTwo.length()>15){
-        JOptionPane.showMessageDialog(null, "You must enter a hand in this format: \n\n"
-               + "As,Td,4c", "Error", JOptionPane.WARNING_MESSAGE);
-        return; 
+    if("".equals(handTwo)){
+        JOptionPane.showMessageDialog(null, "\nPlayer two must have at least one card: \n\nYou must enter a hand in this format: \n\n"
+               + "As,Td,4c or Kd6c9s", "Error", JOptionPane.WARNING_MESSAGE);
+        return;
     }else{
-        handTwoArray = handTwo.split(",\\s*");
+    	handTwo.replaceAll("\\s","");			// remove all the whitespace from the string
+        handTwoArray = handTwo.split(",\\s*");	// divide the string into an array
+        
+        if(handTwoArray.length == 1){
+	        String putTheCommas = handTwoArray[0];
+	        
+	        for(int i=2; i<putTheCommas.length(); i+=2){
+		       putTheCommas = putTheCommas.substring(0, i) + "," + putTheCommas.substring(i+2, putTheCommas.length());
+	        }
+	        
+	        handTwo = putTheCommas.substring(0, putTheCommas.lastIndexOf(",")); // remove trailing comma
+	        Arrays.fill(handTwoArray, null);   // empty the array
+	        handTwoArray = handTwo.split(","); // this time we know the commas are there
+        } 
+        
         handPlayerTwo = new Hand(handTwoArray);
         deck.removeCards(handTwoArray);
         if(handPlayerTwo.getTotalCards()>5){
             JOptionPane.showMessageDialog(null, "More than 5 cards each player is not allowed.", "Error", JOptionPane.WARNING_MESSAGE);
-            return; 
+            return;
         }
     }
-    
-    /*int cardsAreValid = 0;
-    int howManyCards = 0;
-    
-    if(handOneArray.length >= handTwoArray.length){ 
-        howManyCards = handOneArray.length;
-    }else{
-        howManyCards = handTwoArray.length;
-    }*/
 
-    /*for(int i=0; i<5; i++){
-        for(int n=0; n<52; n++){
-            if(fullDeck[n].equals(handOneArray[i]) || fullDeck[n].equals(handTwoArray[i])){
-                fullDeck[n] = "out";
-                cardsAreValid++;
-            }
-        }
-    }
-    if(cardsAreValid < handOneArray.length + handTwoArray.length){
-        JOptionPane.showMessageDialog(null, "Invalid input!  \n Check the players hands.", "Error", JOptionPane.WARNING_MESSAGE);
-        return;
-    }*/
-
+  
+  
+  	/** 
+     * Check if there are any cards on the board and play the hand
+     * No cards in board means the hand is to be played with series of random boards
+     */
     String board = this.textFieldBoard.getText();
     if("".equals(board)){ 
-        //System.out.println(deck.toString());
-      
+    
         for(int i=0; i<numberOfHands; i++){
 
             Hand playerOne = new Hand(handPlayerOne);
             Hand playerTwo = new Hand(handPlayerTwo);
-            Deck deckLeft = new Deck(deck);
+            Deck deckLeft  = new Deck(deck);
             deckLeft.shuffle();
 
-            Hand temp_hand = new Hand();
-            Hand temp_hand_two = new Hand();
+            Hand temp_hand 		= new Hand();
+            Hand temp_hand_two 	= new Hand();
 
             while(playerOne.getTotalCards() < 5){
                 playerOne.addCard(deckLeft.dealCard());
@@ -585,6 +606,7 @@ private void buttonCalculateActionPerformed(java.awt.event.ActionEvent evt) {//G
         } 
     }
 }//GEN-LAST:event_buttonCalculateActionPerformed
+    
     public void evaluateHand(Hand playerHand){
         //System.out.println("Entro al evaluateHand()");
         if(playerHand.isPair()){
